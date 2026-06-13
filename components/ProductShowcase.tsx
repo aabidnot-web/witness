@@ -1,29 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { fadeUp, scaleIn, staggerContainer, viewportConfig } from "@/lib/animations";
-import Hls from "hls.js";
 
 export default function ProductShowcase() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const src = "https://v1-c.pinimg.com/videos/iht/hls/4d/44/fa/4d44fa00c126c82f536e2ef0c53a523d_720w.m3u8";
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(src);
-      hls.attachMedia(video);
-      return () => {
-        hls.destroy();
-      };
-    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = src;
-    }
-  }, [src]);
+  const src = "https://res.cloudinary.com/droyin31u/video/upload/v1781347010/Pin_on_gifys_l6tgnw.mp4";
 
   return (
     <section
@@ -122,7 +103,7 @@ export default function ProductShowcase() {
             }}
           >
             <video
-              ref={videoRef}
+              src={src}
               controls
               autoPlay
               loop
