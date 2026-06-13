@@ -72,7 +72,7 @@ export default function ZoomParallax() {
           <h2
             style={{
               fontFamily: "var(--font-serif)",
-              fontSize: "clamp(2rem, 5vw, 3.8rem)",
+              fontSize: "clamp(2.6rem, 6vw, 4.6rem)",
               fontWeight: 400,
               lineHeight: 1.1,
               letterSpacing: "-0.02em",
@@ -107,15 +107,15 @@ export default function ZoomParallax() {
                   : ""
               } ${
                 index === 3
-                  ? "[&>div]:!left-[27.5vw] [&>div]:!h-[25vh] [&>div]:!w-[25vw]"
+                  ? "[&>div]:!left-[34vw] [&>div]:!top-[8vh] [&>div]:!h-[28vw] [&>div]:!w-[21vw]"
                   : ""
               } ${
                 index === 4
-                  ? "[&>div]:!top-[27.5vh] [&>div]:!left-[5vw] [&>div]:!h-[25vh] [&>div]:!w-[20vw]"
+                  ? "[&>div]:!top-[45vh] [&>div]:!left-[5vw] [&>div]:!h-[20vw] [&>div]:!w-[20vw]"
                   : ""
               } ${
                 index === 5
-                  ? "[&>div]:!top-[27.5vh] [&>div]:!-left-[22.5vw] [&>div]:!h-[25vh] [&>div]:!w-[30vw]"
+                  ? "[&>div]:!top-[45vh] [&>div]:!-left-[22.5vw] [&>div]:!h-[30vw] [&>div]:!w-[30vw]"
                   : ""
               }`}
             >

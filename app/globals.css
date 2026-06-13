@@ -44,10 +44,21 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
@@ -123,6 +134,7 @@ body {
 }
 
 .hero__scroll-blur {
+  display: none;
   position: absolute;
   top: 0;
   left: 50%;
@@ -336,9 +348,8 @@ body {
 .hero__nav-cta {
   color: rgba(247, 241, 232, 0.82);
   font-family: var(--font-body);
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.92rem;
+  letter-spacing: -0.01em;
   text-decoration: none;
   transition:
     color 220ms ease,
