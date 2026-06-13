@@ -24,7 +24,7 @@ export default function ReportPage() {
       minHeight: "100vh",
       background: "#050508",
       color: "#f7f1e8",
-      fontFamily: "var(--font-body, Georgia, serif)",
+      fontFamily: "var(--font-body)",
       padding: "0",
     }}>
 
@@ -46,7 +46,7 @@ export default function ReportPage() {
             onClick={() => router.push("/")}
             style={{
               background: "none", border: "none",
-              fontFamily: "var(--font-serif, Georgia, serif)",
+              fontFamily: "var(--font-serif)",
               fontSize: "1.25rem", color: "#f7f1e8",
               cursor: "pointer", letterSpacing: "-0.02em",
             }}
@@ -195,7 +195,7 @@ export default function ReportPage() {
               Witness Narrative Intelligence
             </div>
             <h1 style={{
-              fontFamily: "var(--font-serif, Georgia, serif)",
+              fontFamily: "var(--font-serif)",
               fontSize: "clamp(1.5rem, 3vw, 2rem)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
@@ -244,7 +244,7 @@ export default function ReportPage() {
                 ].map(item => (
                   <li key={item} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                     <span style={{ color: "#f87171", fontFamily: "monospace", fontSize: 11, marginTop: 1, flexShrink: 0 }}>—</span>
-                    <span style={{ fontSize: 13, color: "rgba(247,241,232,0.75)", lineHeight: 1.5 }}>{item}</span>
+                    <span style={{ fontSize: 13, color: "rgba(247,241,232,0.75)", lineHeight: 1.5, fontFamily: "var(--font-body)" }}>{item}</span>
                   </li>
                 ))}
               </ul>
@@ -257,7 +257,7 @@ export default function ReportPage() {
               </div>
               <ul style={{ margin: 0, padding: "0 0 0 16px", display: "flex", flexDirection: "column", gap: 4 }}>
                 {["Information warfare","Propaganda","Misreporting","Incomplete information","Rapid amplification before verification"].map(r => (
-                  <li key={r} style={{ fontSize: 12, color: "rgba(248,113,113,0.8)", lineHeight: 1.6 }}>{r}</li>
+                  <li key={r} style={{ fontSize: 12, color: "rgba(248,113,113,0.8)", lineHeight: 1.6, fontFamily: "var(--font-body)" }}>{r}</li>
                 ))}
               </ul>
             </div>
@@ -269,7 +269,7 @@ export default function ReportPage() {
 
             <div style={{ padding: "14px 16px", borderRadius: 8, border: "1px solid rgba(251,191,36,0.15)", background: "rgba(251,191,36,0.03)" }}>
               <SectionLabel>Verification Status</SectionLabel>
-              <p style={{ margin: "8px 0 0", fontSize: 12, color: "rgba(247,241,232,0.65)", lineHeight: 1.7 }}>
+              <p style={{ margin: "8px 0 0", fontSize: 12, color: "rgba(247,241,232,0.65)", lineHeight: 1.7, fontFamily: "var(--font-body)" }}>
                 The screenshot confirms these claims were <em>broadcast</em>. It does not confirm the claims are <em>true</em>.
               </p>
             </div>
@@ -280,7 +280,7 @@ export default function ReportPage() {
                 {["Seek official statements","Cross-check international sources","Look for satellite imagery or primary evidence","Do not share until independently verified"].map(r => (
                   <li key={r} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                     <span style={{ color: "#c8a97e", fontFamily: "monospace", fontSize: 11, marginTop: 1, flexShrink: 0 }}>›</span>
-                    <span style={{ fontSize: 12, color: "rgba(247,241,232,0.65)", lineHeight: 1.6 }}>{r}</span>
+                    <span style={{ fontSize: 12, color: "rgba(247,241,232,0.65)", lineHeight: 1.6, fontFamily: "var(--font-body)" }}>{r}</span>
                   </li>
                 ))}
               </ul>
@@ -290,7 +290,7 @@ export default function ReportPage() {
             <div style={{
               borderTop: "1px solid rgba(255,255,255,0.06)",
               paddingTop: 20,
-              fontFamily: "var(--font-serif, Georgia, serif)",
+              fontFamily: "var(--font-serif)",
               fontSize: "clamp(0.8rem, 1.4vw, 0.9rem)",
               color: "rgba(247,241,232,0.5)",
               fontStyle: "italic",
@@ -383,7 +383,7 @@ function Section({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <SectionLabel>{label}</SectionLabel>
-      <p style={{ margin: "6px 0 0", fontSize: 13, color: "rgba(247,241,232,0.75)", lineHeight: 1.6 }}>{value}</p>
+      <p style={{ margin: "6px 0 0", fontSize: 13, color: "rgba(247,241,232,0.75)", lineHeight: 1.6, fontFamily: "var(--font-body)" }}>{value}</p>
     </div>
   );
 }
@@ -397,7 +397,7 @@ function MiniCard({ label, value, color, items }: { label: string; value: string
       </div>
       <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 4 }}>
         {items.map(i => (
-          <li key={i} style={{ fontSize: 11, color: "rgba(247,241,232,0.5)", lineHeight: 1.5 }}>· {i}</li>
+          <li key={i} style={{ fontSize: 11, color: "rgba(247,241,232,0.5)", lineHeight: 1.5, fontFamily: "var(--font-body)" }}>· {i}</li>
         ))}
       </ul>
     </div>
