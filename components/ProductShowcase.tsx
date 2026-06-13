@@ -11,6 +11,11 @@ interface KeyClaim {
   explanation: string;
 }
 
+interface GroundingSource {
+  title: string;
+  uri: string;
+}
+
 interface VerificationResult {
   status: "REAL" | "MANIPULATED" | "CONFLICTING";
   confidence: number;
@@ -36,6 +41,8 @@ export default function ProductShowcase() {
   const [isLoading, setIsLoading] = useState(false);
   const [scanStep, setScanStep] = useState(0);
   const [result, setResult] = useState<VerificationResult | null>(null);
+  const [searchQueries, setSearchQueries] = useState<string[]>([]);
+  const [sources, setSources] = useState<GroundingSource[]>([]);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,6 +69,8 @@ export default function ProductShowcase() {
     setIsLoading(true);
     setError(null);
     setResult(null);
+    setSearchQueries([]);
+    setSources([]);
 
     // Image path → redirect to /report
     if (activeTab === "image") {
@@ -88,7 +97,7 @@ export default function ProductShowcase() {
       return;
     }
 
-    const KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyDIO7RwO_l0EPoywEMvpUY8u4bGzMeCowI";
+    const KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyBlU7YGmX_BvHiOOtr2gQpjcYWpvaWi4qw";
     const MODEL = process.env.NEXT_PUBLIC_GEMINI_MODEL || "gemini-3.1-pro-preview";
     const URL_API = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${KEY}`;
 
@@ -97,8 +106,35 @@ export default function ProductShowcase() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: `You are the narrative verification engine of WITNESS.\nAnalyze the following and respond ONLY with valid JSON matching this schema:\n{\n  "status": "REAL"|"MANIPULATED"|"CONFLICTING",\n  "confidence": number,\n  "summary": string,\n  "keyClaims": [{"claim": string, "status": "Verified"|"Contradictory"|"Unverified", "explanation": string}],\n  "sourceDiversity": string,\n  "recommendation": string\n}\n\nContent:\n${textInput}` }] }],
-          generationConfig: { responseMimeType: "application/json" },
+          contents: [{
+            parts: [{
+              text: `You are the narrative verification engine of WITNESS.
+Use the web search tool to perform a rigorous fact-check and verification of the following claim or URL.
+Search for recent articles, official reports, and credible fact-checking websites to determine if the claim is true, manipulated, or conflicting.
+
+Respond ONLY with valid JSON matching this schema:
+{
+  "status": "REAL" | "MANIPULATED" | "CONFLICTING",
+  "confidence": number,
+  "summary": "A concise paragraph summarizing your findings and the consensus from search results. Be objective.",
+  "keyClaims": [
+    {
+      "claim": "The specific claim extracted from the content",
+      "status": "Verified" | "Contradictory" | "Unverified",
+      "explanation": "Brief explanation of why this claim is verified, contradictory, or unverified based on search grounding."
+    }
+  ],
+  "sourceDiversity": "High" | "Medium" | "Low",
+  "recommendation": "Actionable advice for the user based on search verification."
+}
+
+Do NOT wrap the response in any markdown code block or backticks (e.g. no \`\`\`json). Return the raw JSON string directly.
+
+Content to verify:
+${textInput}`
+            }]
+          }],
+          tools: [{ google_search: {} }]
         }),
       });
 
@@ -106,6 +142,21 @@ export default function ProductShowcase() {
       const data = await res.json();
       const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!raw) throw new Error("Empty response.");
+
+      // Parse grounding metadata
+      const metadata = data.candidates?.[0]?.groundingMetadata;
+      const queries = metadata?.webSearchQueries || [];
+      const chunks = metadata?.groundingChunks || [];
+
+      const parsedSources: GroundingSource[] = chunks
+        .map((chunk: any) => ({
+          title: chunk.web?.title || "",
+          uri: chunk.web?.uri || "",
+        }))
+        .filter((s: GroundingSource) => s.title && s.uri);
+
+      setSearchQueries(queries);
+      setSources(parsedSources);
 
       let clean = raw.trim().replace(/^```json\s*/i, "").replace(/```$/, "").trim();
       await new Promise((r) => setTimeout(r, 1800));
@@ -443,6 +494,118 @@ export default function ProductShowcase() {
                   </div>
                 </div>
 
+                {/* Search Grounding Context */}
+                {(searchQueries.length > 0 || sources.length > 0) && (
+                  <div style={{
+                    marginBottom: "20px",
+                    padding: "16px",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: "10px",
+                    background: "rgba(255,255,255,0.01)",
+                  }}>
+                    {/* Queries */}
+                    {searchQueries.length > 0 && (
+                      <div style={{ marginBottom: sources.length > 0 ? "16px" : "0" }}>
+                        <div style={{ fontFamily: "monospace", fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+                          Verification Queries
+                        </div>
+                        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                          {searchQueries.map((q, i) => (
+                            <span key={i} style={{
+                              fontFamily: "monospace",
+                              fontSize: "10px",
+                              background: "rgba(255,255,255,0.03)",
+                              border: "1px solid var(--border-subtle)",
+                              borderRadius: "4px",
+                              padding: "4px 8px",
+                              color: "var(--text-secondary)",
+                            }}>
+                              "{q}"
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Sources */}
+                    {sources.length > 0 && (
+                      <div>
+                        <div style={{ fontFamily: "monospace", fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+                          Grounding References
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: "150px", overflowY: "auto", paddingRight: "4px" }}>
+                          {sources.map((s, i) => {
+                            let domain = "";
+                            try {
+                              domain = new URL(s.uri).hostname.replace("www.", "");
+                            } catch (e) {
+                              domain = "source";
+                            }
+                            return (
+                              <a
+                                key={i}
+                                href={s.uri}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  padding: "8px 12px",
+                                  background: "var(--bg-elevated)",
+                                  borderRadius: "6px",
+                                  border: "1px solid var(--border-subtle)",
+                                  textDecoration: "none",
+                                  transition: "all 150ms ease",
+                                }}
+                                onMouseEnter={(e) => {
+                                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accent-warm)";
+                                  (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-subtle)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border-subtle)";
+                                  (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-elevated)";
+                                }}
+                              >
+                                <div style={{ display: "flex", flexDirection: "column", gap: "2px", maxWidth: "80%", textAlign: "left" }}>
+                                  <span style={{
+                                    fontSize: "11px",
+                                    color: "var(--text-primary)",
+                                    fontWeight: 500,
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    fontFamily: "var(--font-body)",
+                                  }}>
+                                    {s.title}
+                                  </span>
+                                  <span style={{
+                                    fontSize: "9px",
+                                    color: "var(--text-muted)",
+                                    fontFamily: "monospace",
+                                  }}>
+                                    {domain}
+                                  </span>
+                                </div>
+                                <span style={{
+                                  fontFamily: "monospace",
+                                  fontSize: "9px",
+                                  color: "var(--accent-warm)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "2px",
+                                }}>
+                                  Visit ↗
+                                </span>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Recommendation + Reset */}
                 <div style={{
                   paddingTop: "16px",
@@ -457,7 +620,7 @@ export default function ProductShowcase() {
                     {result.recommendation}
                   </p>
                   <button
-                    onClick={() => { setResult(null); setTextInput(""); setImageFile(null); setImagePreview(null); }}
+                    onClick={() => { setResult(null); setTextInput(""); setImageFile(null); setImagePreview(null); setSearchQueries([]); setSources([]); }}
                     style={{
                       padding: "8px 20px",
                       borderRadius: "999px",
